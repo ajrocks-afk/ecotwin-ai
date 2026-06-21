@@ -13,11 +13,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "EcoTwin AI — Your Carbon Footprint, Personified",
+export const metadata = {
+  title: "EcoTwin AI",
   description:
-    "Meet EcoTwin, a living digital companion that grows with your sustainable choices. Track, understand, and reduce your carbon footprint with AI-powered personalized insights.",
-  keywords: ["carbon footprint", "sustainability", "AI", "eco", "climate"],
+    "AI-powered sustainability companion that helps users reduce their carbon footprint.",
 };
 
 export default function RootLayout({

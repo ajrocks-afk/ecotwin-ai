@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Confetti from "react-confetti";
 
 interface EcoTwinPreviewProps {
   interactive?: boolean;
@@ -136,6 +137,21 @@ export default function EcoTwinPreview({
     <div className="w-full flex flex-col items-center">
       {/* 3D Glassmorphic Container for Twin */}
       <div className="w-full max-w-sm aspect-square glass-panel rounded-3xl p-8 flex flex-col items-center justify-between relative overflow-hidden shadow-2xl transition-all duration-500">
+        {score >= 850 && (
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-4xl animate-pulse z-20">
+            ✨✨✨
+          </div>
+        )}
+
+        {score >= 850 && (
+          <div className="absolute top-4 right-4 z-20 text-yellow-400 text-2xl animate-bounce">
+            👑
+          </div>
+        )}
+
+        {score >= 850 && (
+          <Confetti recycle={false} />
+        )}
         
         {/* Soft Background Glow */}
         <div

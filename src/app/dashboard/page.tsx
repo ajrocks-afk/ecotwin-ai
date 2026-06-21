@@ -7,25 +7,34 @@ import { Loader2, Leaf, TrendingUp, Sparkles } from "lucide-react";
 import EcoTwinPreview from "@/components/EcoTwinPreview";
 import Navbar from "@/components/layout/Navbar";
 import GlassCard from "@/components/ui/GlassCard";
+import { Profile } from "@/types/profile";
 
 export default function DashboardPage() {
   const router = useRouter();
 
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] =useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [futureBoost, setFutureBoost] = useState(100);
+  const [diaryEntry, setDiaryEntry] = useState(
+    "Generating today's diary entry..."
+  );
 
   useEffect(() => {
-    const data = localStorage.getItem("ecotwin-profile");
+    try {
+      const data = localStorage.getItem("ecotwin-profile");
 
-    if (!data) {
-      router.replace("/onboarding");
-      return;
+      if (!data) {
+        router.replace("/onboarding");
+        return;
+      }
+
+      setProfile(JSON.parse(data));
+    } catch (error) {
+      console.error("Failed to load profile:", error);
+    } finally {
+      setLoading(false);
     }
-
-    setProfile(JSON.parse(data));
-    setLoading(false);
   }, [router]);
 
   useEffect(() => {
@@ -47,16 +56,77 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [profile]);
 
+  useEffect(() => {
+    if (!profile) return;
+
+    const generateDiary = async () => {
+      try {
+        const res = await fetch("/api/diary", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            score: profile.twin.score,
+          }),
+        });
+
+         const data = await res.json();
+
+          if (data.diary) {
+            setDiaryEntry(data.diary);
+          }
+      } catch (error) {
+        console.error(error);
+
+        setDiaryEntry(
+          "Today I reflected on my environmental health and I'm ready to grow greener tomorrow."
+        );
+      }
+    };
+
+    generateDiary();
+  }, [profile]);
+
   // Loading spinner while auth resolves
   if (loading || !profile) {
     return (
-      <div className="min-h-screen bg-brand-obsidian flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-emerald animate-spin" />
+      <div className="min-h-screen bg-brand-obsidian p-6">
+        <div className="animate-pulse max-w-7xl mx-auto space-y-6">
+
+          <div className="h-12 w-72 bg-slate-800 rounded-xl" />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="h-32 bg-slate-800 rounded-2xl" />
+            <div className="h-32 bg-slate-800 rounded-2xl" />
+            <div className="h-32 bg-slate-800 rounded-2xl" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-4 h-96 bg-slate-800 rounded-2xl" />
+            <div className="lg:col-span-5 h-96 bg-slate-800 rounded-2xl" />
+            <div className="lg:col-span-3 h-96 bg-slate-800 rounded-2xl" />
+          </div>
+
+        </div>
       </div>
     );
   }
 
   const twin = profile.twin;
+  const twinMood =
+    twin.score >= 700
+      ? "😊 Happy"
+      : twin.score >= 400
+      ? "😐 Concerned"
+      : "😢 Struggling";
+
+  const twinEmotion =
+    twin.score >= 700
+       ? "Your EcoTwin feels energetic and flourishing today."
+      : twin.score >= 400
+      ? "Your EcoTwin senses imbalance but remains hopeful."
+      : "Your EcoTwin is struggling due to your carbon habits.";
 
 
   const firstName = "Explorer";
@@ -112,13 +182,7 @@ export default function DashboardPage() {
   const dailyQuote =
     quotes[new Date().getDate() % quotes.length];
 
-  const diaryEntry =
-  twin.score >= 700
-    ? "Dear diary, today my human made choices that helped the Earth breathe a little easier. I feel stronger and greener than ever!"
-    : twin.score >= 400
-    ? "Dear diary, we're making progress together. Every small eco-friendly action helps me grow."
-    : "Dear diary, I know my human can do even better. I'm excited to see the greener choices we'll make tomorrow!";
-
+  
   const earthHealth = Math.min(
     Math.floor(twin.score / 10),
     100
@@ -137,6 +201,12 @@ export default function DashboardPage() {
 
   if (twin.score >= 900)
     achievements.push("👑 Earth Champion");
+
+  const missions = [
+    "🚲 Use public transport once this week",
+    "💧 Reduce shower time by 2 minutes",
+    "🥗 Eat one plant-based meal today",
+  ];
 
   return (
     <div className="min-h-screen bg-brand-obsidian flex flex-col text-slate-100">
@@ -373,6 +443,20 @@ export default function DashboardPage() {
                 ))}
               </div>
             </GlassCard>
+            
+            <GlassCard className="p-5">
+              <div className="text-xs font-mono text-slate-400 uppercase mb-3">
+                Twin Emotion
+              </div>
+
+              <div className="text-3xl font-bold text-brand-emerald">
+                {twinMood}
+              </div>
+
+              <p className="mt-3 text-sm text-slate-300">
+                {twinEmotion}
+              </p>
+            </GlassCard>
 
             <GlassCard className="p-6">
               <h3 className="font-bold mb-3">
@@ -391,6 +475,7 @@ export default function DashboardPage() {
 
               <input
                 type="range"
+                aria-label="Future sustainability simulator"
                 min="0"
                 max="300"
                 step="50"
@@ -411,6 +496,19 @@ export default function DashboardPage() {
               <p className="text-xs text-slate-500 mt-2">
                 projected eco score
               </p>
+            </GlassCard>
+            <GlassCard className="p-5">
+              <div className="text-xs font-mono text-slate-400 uppercase mb-3">
+                Eco Missions
+              </div>
+
+             <ul className="space-y-3 text-sm">
+               {missions.map((mission) => (
+                 <li key={mission}>
+                   {mission}
+                  </li>
+                ))}
+              </ul>
             </GlassCard>
 
           </div>

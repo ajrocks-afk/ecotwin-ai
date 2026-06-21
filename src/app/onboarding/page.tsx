@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { sanitizeInput } from "@/lib/sanitize";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
@@ -142,9 +143,9 @@ export default function OnboardingPage() {
 
     const profile = {
       onboarding: {
-        diet: answers.diet,
-        commute: answers.commute,
-        home: answers.home,
+        diet: sanitizeInput(answers.diet),
+        commute: sanitizeInput(answers.commute),
+        home: sanitizeInput(answers.home),
       },
       twin: {
         score,

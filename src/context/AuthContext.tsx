@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     console.log("Button clicked!");
 
-    localStorage.setItem("loggedIn", "true");
+    sessionStorage.setItem("loggedIn", "true");
 
     setUser({ uid: "demo-user" } as User);
 
