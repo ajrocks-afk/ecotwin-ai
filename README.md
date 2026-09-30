@@ -348,7 +348,7 @@ npm test
 Clone the repository:
 
 ```bash
-git clone https://github.com/ajrocks-afk/ecotwin-ai.git
+git clone https://github.com/username-here/ecotwin-ai.git
 ```
 
 Install dependencies:
@@ -393,7 +393,7 @@ Theme: AI-powered sustainability experiences.
 
 **Arya Jadhav**
 
-LinkedIn: YOUR_LINKEDIN_URL
+LinkedIn: https://www.linkedin.com/in/arya-jadhav-899282374
 
 GitHub: https://github.com/ajrocks-afk
 
